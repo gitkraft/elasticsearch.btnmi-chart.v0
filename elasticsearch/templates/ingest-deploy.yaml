@@ -1,26 +1,27 @@
+{{- if .Values.ingest.enabled }}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "master.fullname" . }}
+  name: {{ template "ingest.fullname" . }}
   labels:
     app: {{ template "elasticsearch.name" . }}
     chart: {{ template "elasticsearch.chart" . }}
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
-    role: "master"
+    role: "ingest"
 spec:
-  replicas: {{ .Values.master.replicas }}
+  replicas: {{ .Values.ingest.replicas }}
   template:
     metadata:
       labels:
         app: {{ template "elasticsearch.name" . }}
         release: {{ .Release.Name | quote }}
-        role: "master"
+        role: "ingest"
     spec:
       {{- if .Values.rbacEnabled}}
       serviceAccountName: {{ .Values.serviceAccountName | quote }}
       {{- end }}
-      {{- if eq .Values.master.antiAffinity "hard" }}
+      {{- if eq .Values.ingest.antiAffinity "hard" }}
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -29,8 +30,8 @@ spec:
                 matchLabels:
                   app: {{ template "elasticsearch.name" . }}
                   release: {{ .Release.Name | quote }}
-                  role: "master"
-      {{- else if eq .Values.master.antiAffinity "soft" }}
+                  role: "ingest"
+      {{- else if eq .Values.ingest.antiAffinity "soft" }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -41,7 +42,7 @@ spec:
                 matchLabels:
                   app: {{ template "elasticsearch.name" . }}
                   release: {{ .Release.Name | quote }}
-                  role: "master"
+                  role: "ingest"
       {{- end }}
       {{- if .Values.image.pullSecrets }}
       imagePullSecrets:
@@ -57,7 +58,7 @@ spec:
         securityContext:
           privileged: true
       containers:
-      - name: {{ template "master.fullname" . }}
+      - name: {{ template "ingest.fullname" . }}
         image: {{ template "elasticsearch.image" . }}
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         env:
@@ -66,47 +67,50 @@ spec:
         - name: ELASTICSEARCH_PLUGINS
           value: {{ .Values.plugins | quote }}
         - name: ELASTICSEARCH_HEAP_SIZE
-          value: {{ .Values.coordinating.heapSize | quote }}
+          value: {{ .Values.ingest.heapSize | quote }}
         - name: ELASTICSEARCH_IS_DEDICATED_NODE
           value: "yes"
         - name: ELASTICSEARCH_NODE_TYPE
-          value: "master"
+          value: "ingest"
         ports:
         - name: transport
           containerPort: 9300
-        {{- if .Values.master.livenessProbe.enabled }}
+        {{- if .Values.ingest.livenessProbe.enabled }}
         livenessProbe:
-          initialDelaySeconds: {{ .Values.master.livenessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.master.livenessProbe.periodSeconds }}
-          timeoutSeconds: {{ .Values.master.livenessProbe.timeoutSeconds }}
-          successThreshold: {{ .Values.master.livenessProbe.successThreshold }}
-          failureThreshold: {{ .Values.master.livenessProbe.failureThreshold }}
+          initialDelaySeconds: {{ .Values.ingest.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.ingest.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.ingest.livenessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.ingest.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.ingest.livenessProbe.failureThreshold }}
           httpGet:
             path: /_cluster/health?local=true
             port: 9200
+          initialDelaySeconds: 90
         {{- end }}
-        {{- if .Values.master.readinessProbe.enabled }}
+        {{- if .Values.ingest.readinessProbe.enabled}}
         readinessProbe:
-          initialDelaySeconds: {{ .Values.master.livenessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.master.livenessProbe.periodSeconds }}
-          timeoutSeconds: {{ .Values.master.livenessProbe.timeoutSeconds }}
-          successThreshold: {{ .Values.master.livenessProbe.successThreshold }}
-          failureThreshold: {{ .Values.master.livenessProbe.failureThreshold }}
+          initialDelaySeconds: {{ .Values.ingest.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.ingest.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.ingest.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.ingest.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.ingest.readinessProbe.failureThreshold }}
           httpGet:
             path: /_cluster/health?local=true
             port: 9200
-      {{- end }}
+          initialDelaySeconds: 5
+        {{- end}}
         resources:
-{{ toYaml .Values.master.resources | indent 10 }}
+{{ toYaml .Values.ingest.resources | indent 10 }}
         volumeMounts:
         - mountPath: /bitnami/elasticsearch/conf/elasticsearch_custom.yml
           name: "config"
           subPath: elasticsearch_custom.yml
         - name: "data"
-          mountPath: "/bitnami/elasticsearch/data"
+          mountPath: "/bitnami/elasticsearch/data/"
       volumes:
       - name: "config"
         configMap:
           name: {{ template "elasticsearch.fullname" . }}
       - name: "data"
         emptyDir: {}
+{{- end }}
