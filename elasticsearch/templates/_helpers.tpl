@@ -27,7 +27,7 @@ Return the proper ES image name
 */}}
 {{- define "elasticsearch.image" -}}
 {{- $registryName :=  default "docker.io" .Values.image.registry -}}
-{{- $tag := default "latest" .Values.image.tag | quote | trimAll "\"" -}}
+{{- $tag := default "latest" .Values.image.tag | toString -}}
 {{- printf "%s/%s:%s" $registryName .Values.image.repository $tag -}}
 {{- end -}}
 
@@ -47,6 +47,15 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- define "ingest.fullname" -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- printf "%s-%s-%s" .Release.Name $name .Values.ingest.name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Create a default fully qualified discovery name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "discovery.fullname" -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- printf "%s-%s-%s" .Release.Name $name .Values.discovery.name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -81,6 +90,6 @@ Return the proper ES exporter image name
 */}}
 {{- define "metrics.image" -}}
 {{- $registryName :=  default "docker.io" .Values.metrics.image.registry -}}
-{{- $tag := default "latest" .Values.metrics.image.tag | quote | trimAll "\"" -}}
+{{- $tag := default "latest" .Values.metrics.image.tag | toString -}}
 {{- printf "%s/%s:%s" $registryName .Values.metrics.image.repository $tag -}}
 {{- end -}}
