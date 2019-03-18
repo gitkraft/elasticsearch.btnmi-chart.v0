@@ -102,7 +102,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{/*
 Return the proper ES exporter image name
 */}}
-{{- define "metrics.image" -}}
+{{- define "elasticsearch.metrics.image" -}}
 {{- $registryName := .Values.metrics.image.registry -}}
 {{- $repositoryName := .Values.metrics.image.repository -}}
 {{- $tag := .Values.metrics.image.tag | toString -}}
@@ -125,10 +125,10 @@ Also, we can't use a single if because lazy evaluation is not an option
 {{/*
 Return the proper sysctl image name
 */}}
-{{- define "sysctl.image" -}}
-{{- $registryName := .Values.sysctlImage.image.registry -}}
-{{- $repositoryName := .Values.sysctlImage.image.repository -}}
-{{- $tag := .Values.sysctlImage.image.tag | toString -}}
+{{- define "elasticsearch.sysctl.image" -}}
+{{- $registryName := .Values.sysctlImage.registry -}}
+{{- $repositoryName := .Values.sysctlImage.repository -}}
+{{- $tag := .Values.sysctlImage.tag | toString -}}
 {{/*
 Helm 2.11 supports the assignment of a value to a variable defined in a different scope,
 but Helm 2.9 and 2.10 doesn't support it, so we need to implement this if-else logic.
