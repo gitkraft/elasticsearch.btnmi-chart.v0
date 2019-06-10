@@ -56,7 +56,7 @@ The following table lists the configurable parameters of the Elasticsearch chart
 | `image.registry`                                  | Elasticsearch image registry                                                                                              | `docker.io`                                             |
 | `image.repository`                                | Elasticsearch image repository                                                                                            | `bitnami/elasticsearch`                                 |
 | `image.tag`                                       | Elasticsearch image tag                                                                                                   | `{TAG_NAME}`                                            |
-| `image.pullPolicy`                                | Image pull policy                                                                                                         | `Always`                                                |
+| `image.pullPolicy`                                | Image pull policy                                                                                                         | `IfNotPresent`                                          |
 | `image.pullSecrets`                               | Specify docker-registry secret names as an array                                                                          | `[]` (does not add image pull secrets to deployed pods)                                                   |
 | `name`                                            | Elasticsearch cluster name                                                                                                | `elastic`                                               |
 | `plugins`                                         | Comma, semi-colon or space separated list of plugins to install at initialization                                         | `nil`                                                   |
@@ -169,7 +169,7 @@ The following table lists the configurable parameters of the Elasticsearch chart
 | `metrics.image.registry`                          | Metrics exporter image registry                                                                                           | `docker.io`                                             |
 | `metrics.image.repository`                        | Metrics exporter image repository                                                                                         | `bitnami/elasticsearch-exporter`                        |
 | `metrics.image.tag`                               | Metrics exporter image tag                                                                                                | `1.0.2`                                                 |
-| `metrics.image.pullPolicy`                        | Metrics exporter image pull policy                                                                                        | `Always`                                                |
+| `metrics.image.pullPolicy`                        | Metrics exporter image pull policy                                                                                        | `IfNotPresent`                                          |
 | `metrics.service.type`                            | Metrics exporter endpoint service type                                                                                    | `ClusterIP`                                             |
 | `metrics.resources`                               | Metrics exporter resource requests/limit                                                                                  | `requests: { cpu: "25m" }`                              |
 | `metrics.podAnnotations`                          | Annotations for metrics pods. | `{}` |
@@ -195,11 +195,15 @@ Alternatively, a YAML file that specifies the values for the parameters can be p
 $ helm install --name my-release -f values.yaml bitnami/elasticsearch
 ```
 
-> **Tip**: You can use the default [values.yaml](values.yaml). [values-production.yaml](values-production.yaml) has defaults optimized for use in production environments.
+> **Tip**: You can use the default [values.yaml](values.yaml).
 
 ### Production configuration
 
-This chart includes a `values-production.yaml` file where you can find some parameters oriented to production configuration in comparison to the regular `values.yaml`:
+This chart includes a `values-production.yaml` file where you can find some parameters oriented to production configuration in comparison to the regular `values.yaml`.
+
+```console
+$ helm install --name my-release -f ./values-production.yaml bitnami/elasticsearch
+```
 
 - Desired number of Elasticsearch master-eligible nodes:
 ```diff
@@ -237,12 +241,6 @@ This chart includes a `values-production.yaml` file where you can find some para
 +   timeoutSeconds: 5
 +   successThreshold: 1
 +   failureThreshold: 5
-```
-
-- Desired number of Elasticsearch coordinating-only nodes:
-```diff
-- data.replicas: 2
-+ data.replicas: 3
 ```
 
 - Enable the liveness probe (coordinating-only nodes pod):
@@ -319,12 +317,6 @@ This chart includes a `values-production.yaml` file where you can find some para
 ```diff
 - ingest.enabled: false
 + ingest.enabled: true
-```
-
-- Desired number of Elasticsearch ingest nodes:
-```diff
-- data.replicas: 2
-+ data.replicas: 3
 ```
 
 - Enable the liveness probe (ingest nodes pod):
