@@ -8,7 +8,7 @@ metadata:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     role: "curator"
-  name: {{ template "elasticsearch.curator.fullname" . }}-psp
+  name: {{ template "elasticsearch.curator.fullname" . }}
 spec:
   privileged: true
   #requiredDropCapabilities:
@@ -19,7 +19,8 @@ spec:
   hostIPC: false
   hostPID: false
   runAsUser:
-    rule: 'RunAsAny'
+    # Require the container to run without root privileges.
+    rule: 'MustRunAsNonRoot'
   seLinux:
     rule: 'RunAsAny'
   supplementalGroups:
