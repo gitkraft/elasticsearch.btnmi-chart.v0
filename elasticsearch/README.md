@@ -100,7 +100,7 @@ $ helm delete --purge my-release
 | `security.tls.truststoreFilename`          | Name of the truststore                                                                                                                              | `elasticsearch.truststore.jks` |
 | `security.tls.usePemCerts`                 | Use this variable if your secrets contain PEM certificates instead of JKS/PKCS12                                                                    | `false`                        |
 | `security.tls.keyPassword`                 | Password to access the PEM key when they are password-protected.                                                                                    | `""`                           |
-| `name`                                     | Elasticsearch cluster name                                                                                                                          | `""`                           |
+| `name`                                     | Elasticsearch cluster name                                                                                                                          | `elastic`                      |
 | `plugins`                                  | Comma, semi-colon or space separated list of plugins to install at initialization                                                                   | `""`                           |
 | `snapshotRepoPath`                         | File System snapshot repository path                                                                                                                | `""`                           |
 | `config`                                   | Override elasticsearch configuration                                                                                                                | `{}`                           |
@@ -641,6 +641,10 @@ You can enable this initContainer by setting `volumePermissions.enabled` to `tru
 Find more information about how to deal with common errors related to Bitnami’s Helm charts in [this troubleshooting guide](https://docs.bitnami.com/general/how-to/troubleshoot-helm-chart-issues).
 
 ## Upgrading
+
+### To 17.0.0
+
+This version bumps in a major the version of the Kibana Helm Chart bundled as dependecy, [here](https://github.com/bitnami/charts/tree/master/bitnami/kibana#to-900) you can see the changes implemented in this Kibana major version.
 
 ### To 16.0.0
 
